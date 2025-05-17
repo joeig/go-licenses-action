@@ -1,0 +1,20 @@
+name: test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+concurrency:
+  group: "${{ github.workflow }}-$${{ github.pull_request.number || github.run_id }}"
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: joeig/go-licenses-action@${{ github.ref }}
+        with:
+          package: ./testdata/package/...
