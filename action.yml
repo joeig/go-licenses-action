@@ -10,6 +10,9 @@ inputs:
       Comma-separated list of allowed license names. Can't be used in combination with `disallowed-types`.
       Supported license names: [github.com/google/licenseclassifier](https://github.com/google/licenseclassifier/blob/e6a9bb99b5a6f71d5a34336b8245e305f5430f99/license_type.go)
     default: ""
+  application-version:
+    description: The desired version of `github.com/google/go-licenses`.
+    default: "v1.6.0"
   confidence-threshold:
     description: Minimum confidence required in order to positively identify a license.
     default: "0.9"
@@ -37,7 +40,7 @@ runs:
     - uses: actions/setup-go@v5
       with:
         go-version: "1.24"
-    - run: go install github.com/google/go-licenses@v1.6.0
+    - run: go install github.com/google/go-licenses@${{ inputs.application-version }}
       shell: bash
     - run: go-licenses report --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}"
       shell: bash
