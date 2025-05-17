@@ -26,8 +26,11 @@ inputs:
     description: Include packages only imported by testing code.
     default: "true"
   package:
-    description: Package to be checked.
+    description: The package to be checked.
     default: ./...
+  working-directory:
+    description: The working directory.
+    default: ./
 runs:
   using: composite
   steps:
@@ -38,5 +41,7 @@ runs:
       shell: bash
     - run: go-licenses report --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}"
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
     - run: go-licenses check --allowed_licenses="${{ inputs.allowed-licenses }}" --disallowed_types="${{ inputs.disallowed-types }}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}"
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
