@@ -16,9 +16,20 @@ This action helps you ensure that all dependencies in your Go project comply wit
 Add this action to your GitHub workflow:
 
 ```yaml
-steps:
-  - uses: actions/checkout@v4
-  - uses: joeig/go-licenses-action@v1
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4    
+      - uses: joeig/go-licenses-action@v1
+        with:
+          # Optional: Specify disallowed license types
+          disallowed-types: 'forbidden,unknown'
 ```
 
 ## Inputs
