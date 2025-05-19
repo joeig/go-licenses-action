@@ -37,24 +37,40 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-go@v5
+    - name: Setup Go
+      uses: actions/setup-go@v5
       with:
         go-version: "1.24"
-    - run: go install github.com/google/go-licenses@${{ inputs.application-version }}
+    - name: Install go-licenses
+      run: go install github.com/google/go-licenses@${{ inputs.application-version }}
       shell: bash
-    - run: |
+    - name: Generate report
+      run: |
         TEMPLATE="$(mktemp)"
         cat > "${TEMPLATE}" <<EOF
+        Presumed licenses based on the given parameters:
+        
         | Name | Version | License |
         | ---- | ------- | ------- |
         {{ range . -}}
         | {{ .Name }} | {{ .Version }} | [{{ .LicenseName }}]({{ .LicenseURL }}) |
         {{ end }}
-        Presumed licenses based on the given parameters
         EOF
         go-licenses report --template="${TEMPLATE}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}" >> "${GITHUB_STEP_SUMMARY}"
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-    - run: go-licenses check --allowed_licenses="${{ inputs.allowed-licenses }}" --disallowed_types="${{ inputs.disallowed-types }}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}"
+    - name: Check licenses
+      run: |
+        RESULT="$(mktemp)"
+        if ! go-licenses check --allowed_licenses="${{ inputs.allowed-licenses }}" --disallowed_types="${{ inputs.disallowed-types }}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}" >> "${RESULT}"; then
+          RESULT_CONTENT="$(cat "${RESULT}")"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "## ❌ License check failed" >> "${GITHUB_STEP_SUMMARY}"
+          echo "```" >> "${GITHUB_STEP_SUMMARY}"
+          echo "${RESULT_CONTENT}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "```" >> "${GITHUB_STEP_SUMMARY}"
+          echo "::error::License check failed. See job summary for details."
+          exit 1
+        fi
       shell: bash
       working-directory: ${{ inputs.working-directory }}
