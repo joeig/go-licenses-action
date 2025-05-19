@@ -14,18 +14,23 @@ permissions:
   contents: read
 jobs:
   test-mit:
+    name: Test allowed MIT license
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./
         with:
           working-directory: ./testdata/package-mit/
+          allowed-licenses: MIT
+          disallowed-types: ""
     continue-on-error: true
   test-unknown:
+    name: Test disallowed unknown license
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./
         with:
           working-directory: ./testdata/package-unknown/
+          disallowed-types: unknown
     continue-on-error: true
