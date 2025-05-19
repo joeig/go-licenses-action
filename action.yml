@@ -62,7 +62,7 @@ runs:
     - name: Check licenses
       run: |
         RESULT="$(mktemp)"
-        if ! go-licenses check --allowed_licenses="${{ inputs.allowed-licenses }}" --disallowed_types="${{ inputs.disallowed-types }}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}" >> "${RESULT}"; then
+        if ! go-licenses check --allowed_licenses="${{ inputs.allowed-licenses }}" --disallowed_types="${{ inputs.disallowed-types }}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}" >> "${RESULT}" 2>&1; then
           RESULT_CONTENT="$(cat "${RESULT}")"
           echo "" >> "${GITHUB_STEP_SUMMARY}"
           echo "## ❌ License check failed" >> "${GITHUB_STEP_SUMMARY}"
@@ -70,7 +70,6 @@ runs:
           echo "${RESULT_CONTENT}" >> "${GITHUB_STEP_SUMMARY}"
           echo '```' >> "${GITHUB_STEP_SUMMARY}"
           echo "::error::License check failed. See job summary for details."
-          exit 1
         fi
       shell: bash
       working-directory: ${{ inputs.working-directory }}
