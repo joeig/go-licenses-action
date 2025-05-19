@@ -70,6 +70,7 @@ runs:
           echo "${RESULT_CONTENT}" >> "${GITHUB_STEP_SUMMARY}"
           echo '```' >> "${GITHUB_STEP_SUMMARY}"
           echo "::error::License check failed. See job summary for details."
+          exit 1
         fi
       shell: bash
       working-directory: ${{ inputs.working-directory }}
