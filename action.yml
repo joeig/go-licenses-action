@@ -42,7 +42,17 @@ runs:
         go-version: "1.24"
     - run: go install github.com/google/go-licenses@${{ inputs.application-version }}
       shell: bash
-    - run: go-licenses report --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}"
+    - run: |
+        TEMPLATE="$(mktemp)"
+        cat > "${TEMPLATE}" <<EOF
+        | Name | Version | License |
+        | ---- | ------- | ------- |
+        {{ range . -}}
+        | {{ .Name }} | {{ .Version }} | [{{ .LicenseName }}]({{ .LicenseURL }}) |
+        {{ end }}
+        Presumed licenses based on the given parameters
+        EOF
+        go-licenses report --template="${TEMPLATE}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}" >> "${GITHUB_STEP_SUMMARY}"
       shell: bash
       working-directory: ${{ inputs.working-directory }}
     - run: go-licenses check --allowed_licenses="${{ inputs.allowed-licenses }}" --disallowed_types="${{ inputs.disallowed-types }}" --confidence_threshold="${{ inputs.confidence-threshold }}" --ignore="${{ inputs.ignore-packages }}" --include_tests="${{ inputs.include-tests }}" "${{ inputs.package }}"
