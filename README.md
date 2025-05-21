@@ -63,6 +63,7 @@ steps:
   - uses: joeig/go-licenses-action@v1
     with:
       allowed-licenses: "MIT,Apache-2.0,BSD-3-Clause"
+      disallowed-types: ""
 ```
 
 ### Disallow specific license types
