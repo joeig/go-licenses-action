@@ -11,7 +11,7 @@ jobs:
     name: Test allowed MIT license
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./
         with:
           working-directory: ./testdata/package-mit/
@@ -22,7 +22,7 @@ jobs:
     name: Test disallowed unknown license
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./
         with:
           working-directory: ./testdata/package-unknown/
